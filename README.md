@@ -17,7 +17,7 @@ Feature Progress
 Requirements
 ------------
 * Nginx
-* PHP 7.4 or later (ideally the FPM variant), with the following extensions:
+* PHP 8.2 FPM, with the following extensions:
   * PDO
   * SQLite3
   * Fileinfo
