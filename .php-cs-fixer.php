@@ -5,14 +5,14 @@ $finder = PhpCsFixer\Finder::create()
   ->exclude('var')
   ->exclude('tools')
   ->exclude('views')
-  ->notPath('config.example.php')
-  ->notPath('config.php')
+  ->notName('config.example.php')
+  ->notName('config.php')
   ->in(__DIR__)
 ;
 
 $header = <<<'EOT'
 Snail Paste Release Manager: Tool to manage and track software project releases
-Copyright (C) 2023  Snail Paste, LLC
+Copyright (C) 2023-2024  Snail Paste, LLC
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU Affero General Public License as
@@ -31,12 +31,18 @@ EOT;
 $config = new PhpCsFixer\Config();
 return $config->setRules([
   '@PSR12' => true,
+  'array_indentation' => true,
   'declare_strict_types' => true,
   'strict_param' => true,
   'ordered_imports' => true,
+  'no_unused_imports' => true,
   'array_syntax' => ['syntax' => 'short'],
-  'header_comment' => [ 'header' => $header ]
+  'header_comment' => [ 'header' => $header ],
+  'single_blank_line_at_eof' => true,
+  'no_whitespace_in_blank_line' => true,
+  'no_trailing_whitespace' => true
 ])
   ->setIndent("  ")
   ->setFinder($finder)
+  ->setRiskyAllowed(true)
   ;

@@ -20,16 +20,25 @@ declare(strict_types=1);
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace App\Controller;
+namespace App\Misc;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Slim\Views\Twig;
+use League\CommonMark\GithubFlavoredMarkdownConverter;
 
-class AdminController
+class TwigCommonMark extends \Twig\Extension\AbstractExtension
 {
-  public static function index(ServerRequestInterface $request, ResponseInterface $response, Twig $twig): ResponseInterface
+  private GithubFlavoredMarkdownConverter $converter;
+
+  public function __construct()
   {
-    return $twig->render($response, 'admin/login.html.twig', []);
+    $this->converter = new GithubFlavoredMarkdownConverter([
+      'allow_unsafe_links' => false
+    ]);
+  }
+
+  public function getFilters(): array
+  {
+    return [
+      new \Twig\TwigFilter('commonmark', [$this->converter, 'convert'], ['is_safe' => ['all']]),
+    ];
   }
 }

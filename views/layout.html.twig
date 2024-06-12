@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="darkreader-lock">
+    <title>{% block title %}Downloads{% endblock %}</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="pb-5 overflow-y-scroll">
+
+<div class="container">
+    <h1>{{ site_title }}</h1>
+
+    {% block content %}{% endblock %}
+</div>
+
+<div class="fixed-bottom small fst-italic bg-body border-top text-center">Powered by <a href="https://www.snailpaste.com/">Snail Paste Release Manager</a></div>
+
+<script src="/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>

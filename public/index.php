@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * Snail Paste Release Manager: Tool to manage and track software project releases
- * Copyright (C) 2023  Snail Paste, LLC
+ * Copyright (C) 2023-2024  Snail Paste, LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -20,16 +20,16 @@ declare(strict_types=1);
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-require(dirname(__FILE__, 2).'/vendor/autoload.php');
+require(dirname(__DIR__).'/vendor/autoload.php');
 
 use App\Controller\AdminController;
 use App\Controller\FileController;
+use App\Controller\IndexController;
 use App\Database\DatabaseInterface;
+use DI\Bridge\Slim\Bridge;
 use DI\Container;
 use League\Config\Configuration;
 use Nette\Schema\Expect;
-use Psr\Container\ContainerInterface;
-use Slim\Factory\AppFactory;
 use Slim\Routing\RouteCollectorProxy;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
@@ -38,47 +38,63 @@ $container = new Container();
 
 $container->set(Configuration::class, function () {
   $config = new Configuration([
-    // The directory that contains the software release assets to be served
-    'files_root' => Expect::string()->default(dirname(__FILE__, 2).'/files'),
-    'database' => Expect::structure([
-      'driver' => Expect::anyOf('sqlite3')->default('sqlite3')
-    ])
+    // The filesystem path that contains the software release assets to be served
+    'files_root' => Expect::string()->default(dirname(__DIR__).'/files'),
+    'site_title' => Expect::string()->required(),
   ]);
 
-  if (file_exists(dirname(__FILE__, 2).'/config.php')) {
-    $config->merge(require(dirname(__FILE__, 2) . '/config.php'));
-  }
+  $config->merge(require(dirname(__DIR__).'/config.php'));
 
   return $config;
 });
 
-$container->set(DatabaseInterface::class, function (Configuration $config) {
-  $driver = $config->get('database.driver');
-  if ($driver == 'sqlite3') {
-    return new \App\Database\SQLite3([
-      'path' => dirname(__FILE__, 2).'/var/data/data.sqlite3'
-    ]);
-  }
+$container->set(Twig::class, function (Configuration $config) {
+  $twig = Twig::create(dirname(__DIR__).'/views', [
+    'cache' => dirname(__DIR__).'/var/cache/twig',
+    'auto_reload' => true
+  ]);
 
-  return null;
+  $twig->addExtension(new \App\Misc\TwigCommonMark());
+
+  $twig->offsetSet('site_title', $config->get('site_title'));
+
+  return $twig;
 });
 
-$app = AppFactory::createFromContainer($container);
+$container->set(DatabaseInterface::class, function (Configuration $config) {
+  return new \App\Database\SQLite3([
+    'path' => dirname(__DIR__).'/var/data/data.sqlite3'
+  ]);
+});
 
-// Add Twig to Slim
-$twig = Twig::create(dirname(__FILE__, 2).'/views', [
-  'cache' => dirname(__FILE__, 2).'/var/cache/twig'
-]);
-$app->add(TwigMiddleware::create($app, $twig));
+// Create the app
+$app = Bridge::create($container);
+
+// Fetch the configuration, which we'll need to get the files_root path
+$config = $app->getContainer()->get(Configuration::class);
+
+// Restrict the paths that PHP is allowed to read from to limit possible exploits
+ini_set('open_basedir', join(PATH_SEPARATOR, [
+  dirname(__DIR__),
+  $config->get('files_root')
+]));
+
+// Add Twig middleware
+$app->add(TwigMiddleware::createFromContainer($app, Twig::class));
 
 // Define routes
 $app->group('/admin', function (RouteCollectorProxy $group) {
-  $group->get('[/]', [AdminController::class, 'index']);
+  $group->get('', [\App\Controller\RedirectController::class, 'addTrailingSlash']);
+  $group->get('/', [AdminController::class, 'index']);
 });
 
-$app->get('{filepath:.+}/stats/json', [FileController::class, 'statsJSON']);
-$app->get('{filepath:.+}/stats', [FileController::class, 'stats']);
-$app->get('{filepath:.+}', [FileController::class, 'download']);
+$app->get('/{project}/{platform}/{version}/{filename}/info/json', [FileController::class, 'infoJSON'])->setName('infoJSON');
+$app->get('/{project}/{platform}/{version}/{filename}/info', [FileController::class, 'info'])->setName('info');
+$app->get('/{project}/{platform}/{version}/{filename}', [FileController::class, 'download'])->setName('download');
+
+$app->get('/{project_slug}/', [IndexController::class, 'releases'])->setName('releases');
+$app->get('/{project_slug}', [\App\Controller\RedirectController::class, 'addTrailingSlash']);
+$app->get('/', [IndexController::class, 'projects'])->setName('projects');
 
 // Let's go!
 $app->run();

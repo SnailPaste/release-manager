@@ -22,13 +22,29 @@
     "ext-sqlite3": "*",
     "ext-fileinfo": "*",
     "ext-json": "*",
+    "ext-intl": "*",
     "cardinalby/content-disposition": "^1.1",
     "slim/slim": "4.*",
     "slim/twig-view": "^3.3",
+    "slim/csrf": "^1.4",
     "nyholm/psr7": "^1.8",
     "nyholm/psr7-server": "^1.0",
     "php-di/slim-bridge": "^3.4",
     "league/config": "^1.2",
-    "symfony/polyfill-php80": "*"
+    "composer/semver": "^3.4",
+    "nette/utils": "^4.0",
+    "twbs/bootstrap": "^5.3",
+    "league/commonmark": "^2.4"
+  },
+  "scripts": {
+    "post-update-cmd": [
+      "cp vendor/twbs/bootstrap/dist/css/bootstrap.min.css public/css/",
+      "cp vendor/twbs/bootstrap/dist/css/bootstrap.min.css.map public/css/",
+      "cp vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js public/js/",
+      "cp vendor/twbs/bootstrap/dist/js/bootstrap.bundle.min.js.map public/js/"
+    ]
+  },
+  "require-dev": {
+    "symfony/yaml": "^7.1"
   }
 }

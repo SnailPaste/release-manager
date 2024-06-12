@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 /*
  * Snail Paste Release Manager: Tool to manage and track software project releases
- * Copyright (C) 2023  Snail Paste, LLC
+ * Copyright (C) 2023-2024  Snail Paste, LLC
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as
@@ -24,22 +24,11 @@ namespace App\Controller;
 
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Views\Twig;
 
-class Controller
+class RedirectController
 {
-  public function errorPage(ServerRequestInterface $request, ResponseInterface $response, int $status): ResponseInterface
+  public function addTrailingSlash(ServerRequestInterface $request, ResponseInterface $response): ResponseInterface
   {
-    $message = "Unknown server error";
-    switch($status) {
-      case 404: $message = "Page Not Found";
-        break;
-      case 500: $message = "Server Error";
-        break;
-    }
-    $view = Twig::fromRequest($request);
-    return $view
-      ->render($response, 'error.html.twig', compact(['status', 'message']))
-      ->withStatus($status);
+    return $response->withStatus(302)->withHeader('Location', (string)$request->getUri().'/');
   }
 }

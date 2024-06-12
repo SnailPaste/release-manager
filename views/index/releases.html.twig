@@ -1,0 +1,40 @@
+{% extends "layout.html.twig" %}
+
+{% block title %}Releases for {{ project.name }}{% endblock %}
+
+{% block content %}
+    <a href="{{ url_for('projects') }}">Return to project list</a>
+
+    {% for release in releases %}
+        {% if loop.first %}<h2>Releases for {{ project.name }}</h2>{% endif %}
+
+        <div class="card mb-3{% if loop.first %} border-primary bg-secondary-subtle border-3{% endif %}">
+            <div class="card-body">
+                <h5 class="card-title"><span class="visually-hidden">Version</span> {{ release.version }}{% if release.title %} "{{ release.title }}"{% endif %}{% if loop.first %} <span class="badge text-bg-primary">Latest<span class="visually-hidden"> version</span></span>{% endif %}</h5>
+                <h6 class="card-subtitle mb-2 text-body-secondary">Released {{ release.release_date }}</h6>
+                {% if release.summary %}
+                <p class="card-text">
+                    {{ release.summary|commonmark }}
+                </p>
+                {% endif %}
+                {% if release.changelog %}
+                <p class="card-text">
+                    Changelog:<br>
+                    {{ release.changelog|commonmark }}
+                </p>
+                {% endif %}
+                <p class="card-text">
+                    {% for file in files | filter(f => f.release == release.id) %}
+                        <a href="{{ url_for('download', {project: release.project_slug, platform: file.platform_slug, version: release.version, filename: file.filename}) }}">{{ file.filename }} ({{ file.platform_name }})</a><br>
+                    {% endfor %}
+                </p>
+                {% if release.discussion_url %}
+                <a href="{{ release.discussion_url }}" class="card-link">Discussion <span class="visually-hidden"> for version {{ release.version }}</span></a>
+                {% endif %}
+            </div>
+        </div>
+
+    {% else %}
+        No projects published yet. Check back later.
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends "layout.html.twig" %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+    The page you requested cannot be found.
+
+    {% if return_home %}<br><a href="{{ url_for('projects') }}">Return to home</a>{% endif %}
+{% endblock %}

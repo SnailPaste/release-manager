@@ -1,0 +1,12 @@
+{% extends "layout.html.twig" %}
+
+{% block title %}File stats for {{ filename }}{% endblock %}
+
+{% block content %}
+    <a href="{{ url_for('releases', {project_slug: file.project_slug}) }}">Return to project releases</a>
+
+    <h1>{{ filename }}</h1>
+    <p>Project: {{ file.project_name }}</p>
+    <p><small>Path: {{ path }}</small></p>
+    <p>Total Downloads: {{ downloads }}</p>
+{% endblock %}

@@ -6,13 +6,22 @@ uploading and managing software releases. Analytics are recorded for each releas
 Feature Progress
 --------
 * [X] Efficiently sent downloads by using X-Accel-Redirect
-* [X] Per-file statistics endpoint that returns JSON or HTML
-* [ ] Index generation
+* [X] Per-file information endpoint that returns JSON or HTML
+* [X] Project list
+* [X] Release list for each project
+* [ ] Additional metadata about files and releases
+  * [ ] Architectures and/or variants for files
+  * [ ] Stability and branch information for releases
+  * [ ] Automatic linking to the latest file for a release/platform/architecture/variant/branch/stability
+* [ ] File list for a given project/version/platform path
 * [ ] Administration area for managing releases:
   * [ ] Create directories and upload new files
   * [ ] Delete files and directories (with trash can to allow restoring files)
   * [ ] 2FA support/enforcement
   * [ ] Detailed analytics
+  * [ ] Third-party integration
+    * [ ] GitHub releases (to automatically add title and summary with download links)
+    * [ ] phpBB (to create discussion threads for new releases)
 
 Requirements
 ------------
@@ -22,6 +31,7 @@ Requirements
   * SQLite3
   * Fileinfo
   * JSON
+  * Intl
 * [Composer](https://getcomposer.org/download/)
 
 Installation
@@ -34,6 +44,14 @@ This assumes that the website will be stored in ```/var/www/download```, where
 git clone https://github.com/SnailPaste/release-manager /var/www/download
 cd /var/www/download
 composer install
+```
+
+Create and edit ```/var/www/download/config.php``` to contain configuration options, such as:
+```php
+<?php
+return [
+  'site_title' => 'Snail Paste Downloads'
+];
 ```
 
 The Nginx web server should be configured similar to below:
