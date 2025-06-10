@@ -42,7 +42,7 @@ class SQLite3 implements DatabaseInterface
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
       ]);
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
       // TODO: Proper error handling/logging
       die($e->getMessage());
     }
@@ -83,7 +83,7 @@ class SQLite3 implements DatabaseInterface
         // Commit the transaction
         $this->pdo->commit();
       }
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
       // Rollback the attempted upgrade
       $this->pdo->rollBack();
       // TODO: Proper error handling/logging
@@ -244,7 +244,7 @@ class SQLite3 implements DatabaseInterface
       if ($id !== false) {
         return (int)$id;
       }
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
       // TODO: Log failure
     }
 
@@ -380,7 +380,7 @@ class SQLite3 implements DatabaseInterface
       $stmt->bindParam(':project_id', $project_id, PDO::PARAM_INT);
       $stmt->execute();
       return $stmt->fetchAll();
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
       // TODO: Log failures
     }
 
@@ -416,7 +416,7 @@ class SQLite3 implements DatabaseInterface
       if ($id !== false) {
         return (int)$id;
       }
-    } catch(PDOException $e) {
+    } catch (PDOException $e) {
       // TODO: Log failure
     }
 
